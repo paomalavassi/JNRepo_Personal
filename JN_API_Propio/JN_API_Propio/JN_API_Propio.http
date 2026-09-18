@@ -1,0 +1,6 @@
+@JN_API_Propio_HostAddress = http://localhost:5196
+
+GET {{JN_API_Propio_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
