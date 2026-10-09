@@ -24,7 +24,10 @@ namespace JN_Web_Propio.Controllers
             var response = client.PostAsJsonAsync(url, model).Result;
 
             if (response.StatusCode == HttpStatusCode.OK)
-                return RedirectToAction("Index", "Home");
+            { HttpContext.Session.SetInt32("Autenticado", 1); }
+
+            return RedirectToAction("Index", "Home");
+
 
             var datos = response.Content.ReadFromJsonAsync<UsuarioResponse>().Result;
             ViewBag.Mensaje = datos?.Mensaje;

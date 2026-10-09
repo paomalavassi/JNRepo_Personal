@@ -16,6 +16,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+app.UseExceptionHandler("/api/Error/CapturarError");
 
 app.UseHttpsRedirection();
 
