@@ -1,8 +1,7 @@
 ﻿namespace JN_API_Propio.Models
 {
-    public class UsuarioResponse
+    public class ResponseApi
     {
-        public String NombreCompleto { get; set; } = string.Empty;
         public String Mensaje { get; set; } = string.Empty;
     }
 }

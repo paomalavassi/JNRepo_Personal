@@ -1,6 +1,7 @@
 using JN_Web_Propio.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Net;
 
 namespace JN_Web_Propio.Controllers
 {
@@ -22,6 +23,13 @@ namespace JN_Web_Propio.Controllers
             var url = _configuration.GetValue<string>("Variables:ApiBaseUrl") + "Home/Login";
             var response = client.PostAsJsonAsync(url, model).Result;
 
+            if (response.StatusCode == HttpStatusCode.OK)
+                return RedirectToAction("Index", "Home");
+
+            var datos = response.Content.ReadFromJsonAsync<UsuarioResponse>().Result;
+            ViewBag.Mensaje = datos?.Mensaje;
+
+
             return View();
         }
         #endregion
@@ -33,16 +41,25 @@ namespace JN_Web_Propio.Controllers
         {
             return View();
         }
+
         [ValidateAntiForgeryToken]
         [HttpPost]
-        public IActionResult Register(LoginRequestModel model)
+        public IActionResult Register(RegisterRequestModel model)
         {
             using var client = _httpClient;
-            var url = _configuration.GetValue<string>("Variables:ApiBaseUrl") + "Home /Register";
+            var url = _configuration.GetValue<string>("Variables:ApiBaseUrl") + "Home/Register";
+
             var response = client.PostAsJsonAsync(url, model).Result;
+
+            if (response.StatusCode == HttpStatusCode.OK)
+                return RedirectToAction("Login", "Home");
+
+            var datos = response.Content.ReadFromJsonAsync<UsuarioResponse>().Result;
+            ViewBag.Mensaje = datos?.Mensaje;
 
             return View();
         }
+
         #endregion
         #region Recuperar Contraseña
 

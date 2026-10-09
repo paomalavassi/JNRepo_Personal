@@ -19,6 +19,13 @@
 
             @Html.AntiForgeryToken()
 
+            @if (ViewBag.Mensaje != null)
+            {
+                <div class="alert alert-info text-center" role="alert">
+                    @ViewBag.Mensaje
+                </div>
+            }
+
             <div class="login-form-group">
                 <label for="Identificacion" class="login-form-label">Identificación</label>
                 <div class="login-input-group">
