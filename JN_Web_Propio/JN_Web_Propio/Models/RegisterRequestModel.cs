@@ -1,14 +1,20 @@
-﻿namespace JN_Web_Propio.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace JN_Web_Propio.Models
 {
 
         public class RegisterRequestModel
     {
-        public string Identificacion { get; set; } = string.Empty;
-
-        public string NombreCompleto { get; set; } = string.Empty;
-
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "La contraseña es obligatoria")]
         public string Contrasenna { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "La identificación es obligatoria")]
+        public string Identificacion { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "El nombre completo es obligatorio")]
+        public string NombreCompleto { get; set; } = string.Empty;
     }
     }

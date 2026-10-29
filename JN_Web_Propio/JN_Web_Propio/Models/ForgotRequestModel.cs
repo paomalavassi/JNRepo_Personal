@@ -1,8 +1,11 @@
-﻿namespace JN_Web_Propio.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace JN_Web_Propio.Models
 {
 
         public class ForgotRequestModel
     {
+        [Required(ErrorMessage = "El correo electrónico es obligatorio")]
         public string CorreoElectronico { get; set; } = string.Empty;
 
     }
