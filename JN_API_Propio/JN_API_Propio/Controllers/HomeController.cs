@@ -66,34 +66,18 @@ namespace JN_API_Propio.Controllers
                 return NotFound(new UsuarioResponse { Mensaje = "No se validó la información correctamente" });
 
             //Mecanismo de recuperación
-            var usuarioId = _password.Cifrar(response.IdUsuario.ToString(), TimeSpan.FromHours(1));
+            var horas = 1;
+            var usuarioId = _password.Cifrar(response.IdUsuario.ToString(), TimeSpan.FromHours(horas));
             var linkCorreo = _configuration.GetValue<string>("Variables:LinkForgot") + usuarioId;
 
             //Enviar correo electrónico
+            var html = System.IO.File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Template", "RecuperarAcceso.html"))
+                .Replace("{{NOMBRE}}", System.Net.WebUtility.HtmlEncode(response.NombreCompleto))
+                .Replace("{{LINK}}", System.Net.WebUtility.HtmlEncode(linkCorreo))
+                .Replace("{{HORAS}}", horas.ToString());
 
+            _password.EnviarCorreo(model.CorreoElectronico, "Recuperación de Acceso", html);
             return Ok(response);
-        }
-
-        [HttpPut]
-        [Route("ChangePassword")]
-        public IActionResult ChangePassword(ChangePasswordRequestModel model)
-        {
-            string usuarioId = _password.Descifrar(model.UsuarioId);
-
-            if (string.IsNullOrEmpty(usuarioId))
-                return UnprocessableEntity(new UsuarioResponse { Mensaje = "El enlace no es válido o ya expiró" });
-
-            using var context = new SqlConnection(_configuration.GetValue<string>("Variables:ConnectionString"));
-
-            var parameters = new DynamicParameters();
-            parameters.Add("@UsuarioId", usuarioId);
-            parameters.Add("@Contrasenna", model.ContrasennaNueva);
-            var response = context.Execute("sp_ActualizarContrasenna", parameters);
-
-            if (response <= 0)
-                return UnprocessableEntity(new UsuarioResponse { Mensaje = "No se actualizó la información correctamente" });
-
-            return Ok(new UsuarioResponse { Mensaje = "Se actualizó la información correctamente" });
         }
 
     }

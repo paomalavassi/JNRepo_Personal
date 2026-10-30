@@ -26,15 +26,18 @@ namespace JN_Web_Propio.Controllers
             var url = _configuration.GetValue<string>("Variables:ApiBaseUrl") + "Home/Login";
 
             var response = client.PostAsJsonAsync(url, model).Result;
+            var datos = response.Content.ReadFromJsonAsync<UsuarioResponse>().Result;
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 HttpContext.Session.SetInt32("Autenticado", 1);
+                HttpContext.Session.SetString("Nombre", datos!.NombreCompleto);
+                HttpContext.Session.SetString("Rol", datos!.NombreRol);
                 return RedirectToAction("Index", "Home");
+
             }
 
-            var datos = response.Content.ReadFromJsonAsync<UsuarioResponse>().Result;
-            ViewBag.Mensaje = datos?.Mensaje;
+           
 
             return View();
         }
@@ -140,9 +143,17 @@ namespace JN_Web_Propio.Controllers
         }
 
         #endregion
+        [HttpGet]
+        public IActionResult CerrarSesion()
+        {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login", "Home");
+        }
 
+        [HttpGet]
         public IActionResult Index()
         {
+            HttpContext.Session.Clear();
             return View();
         }
     }

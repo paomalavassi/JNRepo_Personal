@@ -1,11 +1,15 @@
-﻿using System.Security.Cryptography;
+﻿using MailKit.Security;
+using MailKit.Net.Smtp;
+using MimeKit;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace JN_API_Propio.Services
 {
-    public class PasswordService : IPasswordService
+    public class PasswordService(IConfiguration _configuration) : IPasswordService
     {
         private readonly byte[] Key = Convert.FromBase64String("sy+v61jJHH5tZTjth2g+PwKpfUiNXWA0ImlUWxikTKUedfPEC6zrkDSzsneTbfkTXJnaEchH7BcVBF4XkqIMDw==");
+
 
         public string Cifrar(string userId, TimeSpan vigencia)
         {
@@ -25,7 +29,6 @@ namespace JN_API_Propio.Services
                 return Convert.ToBase64String(datos).TrimEnd('=').Replace('+', '-').Replace('/', '_');
             }
         }
-
         public string Descifrar(string token)
         {
             try
@@ -55,6 +58,27 @@ namespace JN_API_Propio.Services
                 }
             }
             catch { return string.Empty; }
+        }
+
+        public async Task EnviarCorreo(string to, string subject, string htmlBody)
+        {
+            var cuenta = _configuration.GetValue<string>("Variables:CuentaCorreo") ?? string.Empty;
+            var clave = _configuration.GetValue<string>("Variables:ClaveCorreo") ?? string.Empty;
+
+            if (string.IsNullOrEmpty(clave))
+                return;
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Web JN", cuenta));
+            message.To.Add(MailboxAddress.Parse(to));
+            message.Subject = subject;
+            message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
+
+            using var client = new SmtpClient();
+            await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await client.AuthenticateAsync(cuenta, clave);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
     }
 }
