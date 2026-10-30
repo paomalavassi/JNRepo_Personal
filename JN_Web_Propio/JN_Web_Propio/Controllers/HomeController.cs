@@ -153,7 +153,7 @@ namespace JN_Web_Propio.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            HttpContext.Session.Clear();
+            
             return View();
         }
     }
